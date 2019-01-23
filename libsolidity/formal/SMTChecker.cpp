@@ -47,6 +47,19 @@ SMTChecker::SMTChecker(ErrorReporter& _errorReporter, map<h256, string> const& _
 #endif
 }
 
+SMTChecker::~SMTChecker()
+{
+#if !(defined (HAVE_Z3) || defined (HAVE_CVC4))
+	if (!m_interface->unhandledQueries().empty())
+		m_errorReporter.warning(
+			SourceLocation(),
+			"No SMT solver is available,"
+			" therefore any SMTChecker analysis"
+			" must be ignored."
+		);
+#endif
+}
+
 void SMTChecker::analyze(SourceUnit const& _source, shared_ptr<Scanner> const& _scanner)
 {
 	m_variableUsage = make_shared<VariableUsage>(_source);
